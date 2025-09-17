@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+readme
+.env
+.env.prod
+uploads/
+.txt
+todo.txt
+zzToDo.txt
