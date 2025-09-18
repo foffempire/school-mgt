@@ -91,6 +91,7 @@ class UserBase(UserCreate):
 
 class Staff(UserBase, table=True):
     staff_no: Optional[str] = Field(default=None, unique=True)
+    position: Optional[str] = None
     role: Role = 'staff'
     hire_date: date
     qualification: Optional[str] = None
@@ -114,6 +115,8 @@ class Teacher(UserBase, table=True):
     nok_phone: Optional[str] = None
     nok_email: Optional[str] = None
     nok_relationship: Optional[str] = None
+    class_managed: Optional[str] = None
+    arm: Optional[str] = None
     
     # Relationships
     school: Optional[School] = Relationship(back_populates="teacher")
@@ -137,6 +140,7 @@ class Arm(SQLModel, table=True):
     is_active: bool = Field(default=True)
 
     school: Optional[School] = Relationship(back_populates="arm")
+    students: Optional["Student"] = Relationship(back_populates="arm")
 
 
 class Class_(SQLModel, table=True):
@@ -189,6 +193,7 @@ class Student(UserBase, table=True):
     # Relationships
     school: Optional[School] = Relationship(back_populates="student")
     class_: Optional["Class_"] = Relationship(back_populates="students")
+    arm: Optional["Arm"] = Relationship(back_populates="students")
     parent: Optional["Parent"] = Relationship(back_populates="students")
 
 

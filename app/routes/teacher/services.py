@@ -27,6 +27,14 @@ def get_teachers(school_id, db: Session):
     return db.exec(select(Teacher).where(Teacher.school_id == school_id, Teacher.is_active == True)).all()
 
 
+def get_teacher(teacher_id, school_id, db: Session):
+    query = db.exec(select(Teacher).where(Teacher.school_id == school_id, Teacher.id == teacher_id, Teacher.is_active == True)).first()
+    if not query:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher not found")
+    
+    return query
+
+
 def create_teacher(school_id, db: Session, teacher_data: TeacherCreate):
 
     if(teacher_email_exist(school_id, teacher_data.email, db )):
@@ -76,3 +84,16 @@ def deactivate_teacher(teacher_id, school_id, db: Session):
     db.add(query)
     db.commit()
     return {"success": "Deleted Successfully"} 
+
+
+
+# def assign_teacher_class(teacher_id, school_id, db: Session, class_name):
+#     query = db.exec(select(Teacher).where(Teacher.school_id == school_id, Teacher.id == teacher_id, Teacher.is_active == True)).first()
+#     if not query:
+#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher not found.")
+    
+    
+#     query.class_managed = class_name
+#     db.add(query)
+#     db.commit()
+#     return query

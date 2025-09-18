@@ -8,6 +8,7 @@ from app.routes.admin.schema import AdminPublic
 from app.routes.class_.schema import ClassPublic
 from app.routes.class_arm.schema import ArmPublic
 from app.routes.parent.schema import ParentPublic
+from app.routes.staff.schema import StaffPublic
 from app.routes.student.schema import StudentPublic
 from app.routes.teacher.schema import TeacherPublic
 
@@ -27,7 +28,7 @@ class SchoolPublic(BaseModel):
     date_deleted: Optional[date]
     date_created: date
 
-    # staff: List[StaffPublic]
+    staff: List[StaffPublic]
     teacher: List[TeacherPublic]
     student: List[StudentPublic]
     parent: List[ParentPublic]

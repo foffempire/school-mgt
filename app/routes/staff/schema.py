@@ -1,18 +1,15 @@
-from typing import List, Optional
+from typing import Optional
 from pydantic import BaseModel
-from sqlmodel import SQLModel, Field, Relationship
-from datetime import datetime, date, time, timezone
-from enum import Enum
-from app.db.models import UserCreate, UserBase
+from datetime import date
+from app.db.models import UserBase
 
 
-class TeacherPublic(UserBase):    
-    teacher_no: Optional[str] = None
+class StaffPublic(UserBase):    
+    staff_no: Optional[str] = None
+    position: Optional[str] = None
     role: str
     hire_date: date
     qualification: Optional[str] = None
-    class_managed: Optional[str] = None
-    arm: Optional[str] = None
     nok_names: Optional[str] = None
     nok_address: Optional[str] = None
     nok_phone: Optional[str] = None
@@ -22,7 +19,7 @@ class TeacherPublic(UserBase):
 
 
 
-class TeacherCreate(BaseModel):
+class StaffCreate(BaseModel):
     firstname: str
     lastname: str
     othername: Optional[str]
@@ -33,14 +30,13 @@ class TeacherCreate(BaseModel):
     address: Optional[str]
     blood_group: Optional[str]
     Religion: Optional[str]
-    teacher_no: Optional[str] = None
-    hire_date: date
     bio: Optional[str] = None
-    image: Optional[str] = None
     date_of_birth: Optional[date] = None
+    image: Optional[str] = None
+    staff_no: Optional[str] = None
+    position: Optional[str] = None
+    hire_date: date
     qualification: Optional[str] = None
-    class_managed: Optional[str] = None
-    arm: Optional[str] = None
     nok_names: Optional[str] = None
     nok_address: Optional[str] = None
     nok_phone: Optional[str] = None
@@ -49,7 +45,7 @@ class TeacherCreate(BaseModel):
 
 
 
-class TeacherUpdate(BaseModel):
+class StaffUpdate(BaseModel):
     firstname: str
     lastname: str
     othername: Optional[str]
@@ -60,18 +56,17 @@ class TeacherUpdate(BaseModel):
     address: Optional[str]
     blood_group: Optional[str]
     Religion: Optional[str]
-    teacher_no: Optional[str] = None
+    bio: Optional[str] = None
+    date_of_birth: Optional[date] = None
+    staff_no: Optional[str] = None
+    position: Optional[str] = None
     hire_date: date
     qualification: Optional[str] = None
-    class_managed: Optional[str] = None
-    arm: Optional[str] = None
     nok_names: Optional[str] = None
     nok_address: Optional[str] = None
     nok_phone: Optional[str] = None
     nok_email: Optional[str] = None
     nok_relationship: Optional[str] = None
-    bio: Optional[str]
-    date_of_birth: Optional[date]
 
 
 

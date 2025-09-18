@@ -14,6 +14,7 @@ from .routes.school import controller as schoolController
 from .routes.teacher import controller as teacherController
 from .routes.student import controller as studentController
 from .routes.parent import controller as parentController
+from .routes.staff import controller as staffController
 
 # @asynccontextmanager
 # async def lifespan(app: FastAPI):
@@ -40,6 +41,7 @@ app.include_router(armController.router)
 app.include_router(teacherController.router)
 app.include_router(studentController.router)
 app.include_router(parentController.router)
+app.include_router(staffController.router)
 
 # @app.post("/add")
 # async def addUser(user: UserBase, session: SessionDep) -> User:
