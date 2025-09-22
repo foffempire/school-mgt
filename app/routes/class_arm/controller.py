@@ -7,8 +7,8 @@ from .services import deactivate_arm, get_arm, get_arms, create_arm, update_arm
 
 router = APIRouter(prefix="/v1/arm", tags=["Arm"])
 
-@router.post("/", response_model=ArmPublic)
-def add_arm(school_arm: ArmCreate, current_admin: CurrentUserDep, db: SessionDep):
+@router.post("/")
+def add_arm(school_arm: List[ArmCreate], current_admin: CurrentUserDep, db: SessionDep):
     return create_arm(current_admin.school_id, db, school_arm)
 
 

@@ -1,24 +1,42 @@
-from fastapi import HTTPException
+from typing import List
+from fastapi import HTTPException, status
 from sqlmodel import Session, select
 from app.db.models import Arm
 from app.security.security import is_owner
 from .schema import ArmCreate
 
 
+
+def arm_exist(school_id, arm_name,db: Session):
+    stmt = db.exec(select(Arm).where(Arm.name == arm_name, Arm.school_id == school_id, Arm.is_active == True)).first()
+    if stmt:
+        return True
+    else:
+        return False
+    
+
+
 def get_arms(school_id, db: Session):
     return db.exec(select(Arm).where(Arm.school_id == school_id, Arm.is_active == True).order_by(Arm.name)).all()
 
 
-def create_arm(school_id, db: Session, school_arm: ArmCreate):
-    data = {
-        "school_id": school_id,
-        "name": school_arm.name,
-    }
-    query = Arm.model_validate(data)
-    db.add(query)
-    db.commit()
-    db.refresh(query)
-    return query
+def create_arm(school_id, db: Session, school_arm: List[ArmCreate]):
+
+    for p in school_arm:         
+        if arm_exist(school_id, p.name, db):
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"{p.name} already created")
+
+
+        data = {
+            "school_id": school_id,
+            "name": p.name,
+        }
+        query = Arm.model_validate(data)
+        db.add(query)
+        db.commit()
+        db.refresh(query)
+    
+    return {"data":"successful"}
 
 
 

@@ -28,12 +28,12 @@ class SchoolPublic(BaseModel):
     date_deleted: Optional[date]
     date_created: date
 
-    staff: List[StaffPublic]
-    teacher: List[TeacherPublic]
-    student: List[StudentPublic]
-    parent: List[ParentPublic]
-    class_: List[ClassPublic]
-    arm: List[ArmPublic]
+    # staff: List[StaffPublic]
+    # teacher: List[TeacherPublic]
+    # student: List[StudentPublic]
+    # parent: List[ParentPublic]
+    # class_: List[ClassPublic]
+    # arm: List[ArmPublic]
     # subject: List[SubjectPublic]
     # announcement: List[AnnouncementPublic]
     # events: List[EventsPublic]

@@ -3,7 +3,7 @@ from typing import List
 from app.db.database import SessionDep
 from app.security.oauth2 import AdminUserDep
 from .schema import AdminCreate, AdminPublic, MakeAdmin, AdminCreateResponse
-from .services import create_account, deactivate_account, make_admin
+from .services import create_account, deactivate_account, make_admin, me_account
 
 router = APIRouter(prefix="/v1/admin", tags=["Admin"])
 
@@ -23,6 +23,11 @@ def make_account(new: MakeAdmin, db: SessionDep, current_admin: AdminUserDep):
 def delete_account(user_id, db: SessionDep, current_admin: AdminUserDep):
     return deactivate_account(user_id, db)
 
+
+
+@router.get("/me", status_code=status.HTTP_200_OK, response_model=AdminPublic)
+def my_account(db: SessionDep, current_admin: AdminUserDep):
+    return me_account(current_admin.id, db)
 
 # @router.get("/", status_code=status.HTTP_200_OK, response_model=List[SchoolPublic])
 # def read_schools(session: SessionDep):

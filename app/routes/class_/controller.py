@@ -7,8 +7,8 @@ from .services import deactivate_class, get_class, get_classes, create_class, up
 
 router = APIRouter(prefix="/v1/class", tags=["Classes"])
 
-@router.post("/", response_model=ClassPublic)
-def add_class(school_class: ClassCreate, current_admin: CurrentUserDep, db: SessionDep):
+@router.post("/")
+def add_class(school_class: List[ClassCreate], current_admin: CurrentUserDep, db: SessionDep):
     return create_class(current_admin.school_id, db, school_class)
 
 

@@ -39,6 +39,7 @@ class School(SQLModel, table=True):
     date_deleted: Optional[date] = None
     date_created: date = Field(default_factory=datetime.now)
 
+    adminaccount: List["AdminAccount"] = Relationship(back_populates="school")
     staff: List["Staff"] = Relationship(back_populates="school")
     teacher: List["Teacher"] = Relationship(back_populates="school")
     parent: List["Parent"] = Relationship(back_populates="school")
@@ -48,6 +49,8 @@ class School(SQLModel, table=True):
     student: List["Student"] = Relationship(back_populates="school")
     announcement: List["Announcement"] = Relationship(back_populates="school")
     events: List["Events"] = Relationship(back_populates="school")
+    # Relationships
+    enrollment: Optional["Enrollments"] = Relationship(back_populates="school")
 
 
 class AdminAccount (SQLModel, table=True):
@@ -60,6 +63,8 @@ class AdminAccount (SQLModel, table=True):
     role: Role = 'admin' 
     is_active: bool = Field(default=True)
     date_created: date = Field(default_factory=datetime.now)
+
+    school: Optional[School] = Relationship(back_populates="adminaccount")
     
 
 
@@ -136,25 +141,28 @@ class Parent(UserBase, table=True):
 class Arm(SQLModel, table=True):
     id: str = Field(primary_key=True, unique=True, default_factory=lambda: str(uuid4()), index=True, nullable=False)
     school_id: str = Field(foreign_key="school.id")
-    name: str = Field(unique=True, index=True)
+    name: str
     is_active: bool = Field(default=True)
 
     school: Optional[School] = Relationship(back_populates="arm")
     students: Optional["Student"] = Relationship(back_populates="arm")
+    enrollment: Optional["Enrollments"] = Relationship(back_populates="arm")
+    schedules: Optional["Schedule"] = Relationship(back_populates="arm")
 
 
 class Class_(SQLModel, table=True):
     id: str = Field(primary_key=True, unique=True, default_factory=lambda: str(uuid4()), index=True, nullable=False)
     school_id: str = Field(foreign_key="school.id")
-    name: str = Field(unique=True, index=True)
-    room_number: Optional[str]
-    academic_year: Optional[str]
+    name: str
+    room_number: Optional[str] = None
+    academic_year: Optional[str] = None
     is_active: bool = Field(default=True)
     
     # Relationships
     school: Optional[School] = Relationship(back_populates="class_")
     students: List["Student"] = Relationship(back_populates="class_")
     schedules: List["Schedule"] = Relationship(back_populates="class_")
+    enrollment: Optional["Enrollments"] = Relationship(back_populates="class_")
 
 
 class Subject(SQLModel, table=True):
@@ -195,6 +203,7 @@ class Student(UserBase, table=True):
     class_: Optional["Class_"] = Relationship(back_populates="students")
     arm: Optional["Arm"] = Relationship(back_populates="students")
     parent: Optional["Parent"] = Relationship(back_populates="students")
+    enrollment: Optional["Enrollments"] = Relationship(back_populates="students")
 
 
 
@@ -207,11 +216,13 @@ class Schedule(SQLModel, table=True):
     is_active: bool = Field(default=True)
     teacher_id: Optional[str] = Field(foreign_key="teacher.id")
     class_id: Optional[str] = Field(foreign_key="class_.id")
+    arm_id: Optional[str] = Field(foreign_key="arm.id")
     subject_id: Optional[str] = Field(foreign_key="subject.id")
     
     # Relationships
     teacher: "Teacher" = Relationship(back_populates="schedules")
     class_: "Class_" = Relationship(back_populates="schedules")
+    arm: "Arm" = Relationship(back_populates="schedules")
     subject: "Subject" = Relationship(back_populates="schedules")
 
 
@@ -252,18 +263,62 @@ class Events(SQLModel, table=True):
 class Grades(SQLModel, table=True):
     id: str = Field(primary_key=True, unique=True, default_factory=lambda: str(uuid4()), index=True, nullable=False)
     school_id: str = Field(foreign_key="school.id")
-    title: str
-    point: Optional[str] = None
-    percent_min: Optional[int]
-    percent_max: Optional[int]
-    comment: Optional[str]
+    title: str #eg A+
+    point: Optional[str] = None #eg 4.50
+    percent_min: Optional[int]  #eg 85%
+    percent_max: Optional[int] #eg 100%
+    comment: Optional[str] #eg Distinction
     is_active: bool = Field(default=True)
 
 
 class AcademicSession(SQLModel, table=True):
     id: str = Field(primary_key=True, unique=True, default_factory=lambda: str(uuid4()), index=True, nullable=False)
     school_id: str = Field(foreign_key="school.id")
-    is_active: bool = Field(default=True)
-    start_date: date
-    end_date: date
+    name: str #eg 2025/2026
     current: bool =Field(default=False)
+    is_active: bool = Field(default=True)
+
+
+    # Relationships
+    enrollment: Optional["Enrollments"] = Relationship(back_populates="academicsession")
+
+
+
+class Term (SQLModel, table=True):
+    id: str = Field(primary_key=True, unique=True, default_factory=lambda: str(uuid4()), index=True, nullable=False)
+    school_id: str = Field(foreign_key="school.id")
+    name: str # e.g. 'First Term'
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    
+
+
+class Enrollments(SQLModel, table=True):
+    id: str = Field(primary_key=True, unique=True, default_factory=lambda: str(uuid4()), index=True, nullable=False)
+    school_id: str = Field(foreign_key="school.id")
+    student_id: str = Field(foreign_key="student.id")
+    class_id: str = Field(foreign_key="class_.id")
+    arm_id: str = Field(foreign_key="arm.id")
+    academicsession_id: str = Field(foreign_key="academicsession.id")
+    enrollment_date: date = Field(default_factory=datetime.now)
+    status: str = Field(default='enrolled', nullable=True) #eg enrolled, graduated, expelled, withdrawn, other 
+
+    # Relationships
+    school: Optional[School] = Relationship(back_populates="enrollment")
+    students: List["Student"] = Relationship(back_populates="enrollment")
+    class_: List["Class_"] = Relationship(back_populates="enrollment") 
+    arm: List["Arm"] = Relationship(back_populates="enrollment") 
+    academicsession: List["AcademicSession"] = Relationship(back_populates="enrollment") 
+    
+
+
+class Attendance (SQLModel, table=True):
+    id: str = Field(primary_key=True, unique=True, default_factory=lambda: str(uuid4()), index=True, nullable=False)
+    school_id: str = Field(foreign_key="school.id")
+    student_id: str = Field(foreign_key="student.id")
+    class_id: str = Field(foreign_key="class_.id")
+    arm_id: str = Field(foreign_key="arm.id")
+    status: Optional[str] = None
+    reason: Optional[str] = None
+    recorded_by: str
+    date_created: date = Field(default_factory=datetime.now)

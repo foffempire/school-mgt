@@ -5,7 +5,7 @@ from app.db.database import SessionDep
 from app.db.models import Staff
 from app.security.oauth2 import CurrentUserDep
 from .schema import StaffCreate, StaffPublic, StaffUpdate
-from .services import deactivate_staff, edit_staff, get_staff, get_staffs, create_staff
+from .services import archive_staff, deactivate_staff, edit_staff, get_archived_staffs, get_staff, get_staffs, create_staff
 
 router = APIRouter(prefix="/v1/staff", tags=["Staff"])
 
@@ -28,6 +28,18 @@ def add_staff(current_user: CurrentUserDep, staff: StaffCreate, db: SessionDep):
 @router.patch("/{staff_id}", response_model=StaffPublic)
 def update_staff(staff_id, current_user: CurrentUserDep, staff: StaffUpdate, db: SessionDep):
     return edit_staff(staff_id, current_user.school_id, db, staff)
+
+
+
+@router.get("/archive/all", response_model=List[StaffPublic])
+def archived_staffs(current_user: CurrentUserDep, db: SessionDep):
+    return get_archived_staffs(current_user.school_id, db)
+
+
+
+@router.patch("/archive/{staff_id}")
+def archive_a_staff(staff_id, current_user: CurrentUserDep, db: SessionDep):
+    return archive_staff(staff_id, current_user.school_id, db)
 
 
 

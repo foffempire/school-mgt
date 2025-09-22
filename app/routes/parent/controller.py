@@ -3,7 +3,7 @@ from typing import List
 from app.db.database import SessionDep
 from app.security.oauth2 import CurrentUserDep
 from .schema import ParentCreate, ParentPublic, ParentUpdate
-from .services import deactivate_parent, edit_parent, get_parent, get_parents, create_parent
+from .services import archive_parent, deactivate_parent, edit_parent, get_archived_parents, get_parent, get_parents, create_parent
 
 router = APIRouter(prefix="/v1/parent", tags=["Parents"])
 
@@ -26,6 +26,18 @@ def add_parent(current_user: CurrentUserDep, parent: ParentCreate, db: SessionDe
 @router.patch("/{parent_id}", response_model=ParentPublic)
 def update_parent(parent_id, current_user: CurrentUserDep, parent: ParentUpdate, db: SessionDep):
     return edit_parent(parent_id, current_user.school_id, db, parent)
+
+
+
+@router.get("/archive/all", response_model=List[ParentPublic])
+def archived_parents(current_user: CurrentUserDep, db: SessionDep):
+    return get_archived_parents(current_user.school_id, db)
+
+
+
+@router.patch("/archive/{parent_id}")
+def archive_a_parent(parent_id, current_user: CurrentUserDep, db: SessionDep):
+    return archive_parent(parent_id, current_user.school_id, db)
 
 
 

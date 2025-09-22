@@ -58,6 +58,24 @@ def edit_parent(parent_id, school_id, db: Session, parent_data: ParentUpdate):
 
 
 
+def get_archived_parents(school_id, db: Session):
+    return db.exec(select(Parent).where(Parent.school_id == school_id, Parent.is_active == False, Parent.is_deleted == False)).all()
+
+
+
+def archive_parent(parent_id, school_id, db: Session):
+    query = db.exec(select(Parent).where(Parent.school_id == school_id, Parent.id == parent_id, Parent.is_active == True)).first()
+    if not query:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Parent not found.")
+    
+    
+    query.is_active = False
+    db.add(query)
+    db.commit()
+    return {"success": "Parent moved to archive"} 
+
+
+
 def deactivate_parent(parent_id, school_id, db: Session):
     query = db.exec(select(Parent).where(Parent.school_id == school_id, Parent.id == parent_id, Parent.is_active == True)).first()
     if not query:

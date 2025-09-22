@@ -1,6 +1,6 @@
 from fastapi import HTTPException, status
 from sqlmodel import Session, select
-from app.db import models
+from app.db.models import AdminAccount
 from app.security import oauth2
 from app.security.security import get_password_hash
 from .schema import AdminCreate, MakeAdmin
@@ -8,7 +8,7 @@ from .schema import AdminCreate, MakeAdmin
 
 
 def email_exist(email: str, db: Session):
-    query = db.exec(select(models.AdminAccount).where(models.AdminAccount.email == email)).first()
+    query = db.exec(select(AdminAccount).where(AdminAccount.email == email)).first()
     if query:
         return True
     else:
@@ -21,7 +21,7 @@ def create_account(db: Session, admin = AdminCreate):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email have been used, try another email")
     
     admin.password = get_password_hash(admin.password)
-    query = models.AdminAccount.model_validate(admin)
+    query = AdminAccount.model_validate(admin)
     db.add(query)
     db.commit()
     db.refresh(query)
@@ -47,7 +47,7 @@ def make_admin(db: Session, school_id, new = MakeAdmin):
         "role": "staff"
     }
 
-    query = models.AdminAccount.model_validate(data)
+    query = AdminAccount.model_validate(data)
     db.add(query)
     db.commit()
     db.refresh(query)
@@ -56,7 +56,7 @@ def make_admin(db: Session, school_id, new = MakeAdmin):
 
 
 def deactivate_account(user_id, db: Session):
-    query = db.exec(select(models.AdminAccount).where(models.AdminAccount.id == user_id)).first()
+    query = db.exec(select(AdminAccount).where(AdminAccount.id == user_id)).first()
 
     if not query:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
@@ -70,3 +70,11 @@ def deactivate_account(user_id, db: Session):
     db.add(query)
     db.commit()
     return {"success": "Deleted Successfully"}
+
+
+def me_account(user_id, db: Session):
+    query = db.exec(select(AdminAccount).where(AdminAccount.id == user_id, AdminAccount.is_active == True)).first()
+    if not query:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, datail="Unauthorized")
+    
+    return query

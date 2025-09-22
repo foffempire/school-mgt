@@ -5,7 +5,7 @@ from app.db.database import SessionDep
 from app.db.models import Teacher
 from app.security.oauth2 import CurrentUserDep
 from .schema import TeacherCreate, TeacherPublic, TeacherUpdate
-from .services import deactivate_teacher, edit_teacher, get_teacher, get_teachers, create_teacher
+from .services import archive_teacher, deactivate_teacher, edit_teacher, get_archived_teachers, get_teacher, get_teachers, create_teacher
 
 router = APIRouter(prefix="/v1/teacher", tags=["Teachers"])
 
@@ -28,6 +28,18 @@ def add_teacher(current_user: CurrentUserDep, teacher: TeacherCreate, db: Sessio
 @router.patch("/{teacher_id}", response_model=TeacherPublic)
 def update_teacher(teacher_id, current_user: CurrentUserDep, teacher: TeacherUpdate, db: SessionDep):
     return edit_teacher(teacher_id, current_user.school_id, db, teacher)
+
+
+
+@router.get("/archive/all", response_model=List[TeacherPublic])
+def archived_teachers(current_user: CurrentUserDep, db: SessionDep):
+    return get_archived_teachers(current_user.school_id, db)
+
+
+
+@router.patch("/archive/{teacher_id}")
+def archive_a_teacher(teacher_id, current_user: CurrentUserDep, db: SessionDep):
+    return archive_teacher(teacher_id, current_user.school_id, db)
 
 
 

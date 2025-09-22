@@ -1,15 +1,16 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
-from app.core.config import Settings
-from app.db.models import Schedule, UserBase
-from .db.database import SessionDep, create_db_and_tables
-from sqlmodel import select
+from app.db.models import Schedule
+from .db.database import create_db_and_tables
+from fastapi.middleware.cors import CORSMiddleware
 
 from .routes.auth import controller as authController
 from .routes.admin import controller as adminController
 from .routes.class_ import controller as classController
 from .routes.class_arm import controller as armController
+from .routes.academics import controller as academicController
+from .routes.term import controller as termController
 from .routes.school import controller as schoolController
 from .routes.teacher import controller as teacherController
 from .routes.student import controller as studentController
@@ -22,6 +23,18 @@ from .routes.staff import controller as staffController
 #     yield
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 def on_startup():
@@ -38,6 +51,8 @@ app.include_router(schoolController.router)
 app.include_router(adminController.router)
 app.include_router(classController.router)
 app.include_router(armController.router)
+app.include_router(academicController.router)
+app.include_router(termController.router)
 app.include_router(teacherController.router)
 app.include_router(studentController.router)
 app.include_router(parentController.router)

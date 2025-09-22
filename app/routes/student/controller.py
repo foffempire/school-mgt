@@ -39,7 +39,7 @@ def archive_a_student(student_id, current_user: CurrentUserDep, db: SessionDep):
 
 
 
-@router.get("/archived", response_model=List[StudentPublic])
+@router.get("/archive/all", response_model=List[StudentPublic])
 def archived_students(current_user: CurrentUserDep, db: SessionDep):
     return get_archived_students(current_user.school_id, db)
 

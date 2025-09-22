@@ -72,6 +72,25 @@ def edit_staff(staff_id, school_id, db: Session, staff_data: StaffUpdate):
 
 
 
+def get_archived_staffs(school_id, db: Session):
+    return db.exec(select(Staff).where(Staff.school_id == school_id, Staff.is_active == False, Staff.is_deleted == False)).all()
+
+
+
+
+def archive_staff(staff_id, school_id, db: Session):
+    query = db.exec(select(Staff).where(Staff.school_id == school_id, Staff.id == staff_id, Staff.is_active == True)).first()
+    if not query:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Staff not found.")
+    
+    
+    query.is_active = False
+    db.add(query)
+    db.commit()
+    return {"success": "Staff moved to archive"} 
+
+
+
 def deactivate_staff(staff_id, school_id, db: Session):
     query = db.exec(select(Staff).where(Staff.school_id == school_id, Staff.id == staff_id, Staff.is_active == True)).first()
     if not query:

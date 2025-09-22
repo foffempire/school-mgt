@@ -16,6 +16,4 @@ class ClassPublic(SQLModel):
 
 class ClassCreate(SQLModel):
     name: str
-    room_number: Optional[str] = None
-    academic_year: Optional[str] = None
 
