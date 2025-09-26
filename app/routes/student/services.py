@@ -1,8 +1,10 @@
 from datetime import datetime
+from typing import List
 from fastapi import HTTPException, status
 from sqlmodel import Session, select
 from app.db.models import Student
-from .schema import StudentCreate, StudentUpdate
+from app.image.services import upload_image
+from .schema import StudentCreate, StudentId, StudentUpdate
 
 
 
@@ -15,12 +17,14 @@ def student_number_exist(school_id, student_number,db: Session):
 
 
 def student_email_exist(school_id, email, db: Session):
+    if not email:
+        return False
+    
     stmt = db.exec(select(Student).where(Student.email == email, Student.school_id == school_id)).first()
     if stmt:
         return True
     else:
         return False
-
 
 
 def get_students(school_id, db: Session):
@@ -71,17 +75,44 @@ def edit_student(student_id, school_id, db: Session, student_data: StudentUpdate
     return query
 
 
-
-def archive_student(student_id, school_id, db: Session):
+async def edit_student_image(file, student_id, school_id, db: Session):
     query = db.exec(select(Student).where(Student.school_id == school_id, Student.id == student_id, Student.is_active == True)).first()
     if not query:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found.")
     
-    
-    query.is_active = False
+    filename = await upload_image(file)
+    query.image = filename
     db.add(query)
     db.commit()
-    return {"success": "Student moved to archive"} 
+    db.refresh(query)
+    return query
+
+
+def archive_student(student_ids: List[StudentId], school_id, db: Session):
+    for student_id in student_ids:
+        query = db.exec(select(Student).where(Student.school_id == school_id, Student.id == student_id.id, Student.is_active == True)).first()
+        if not query:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="One of the selected students not found.")
+        
+        
+        query.is_active = False
+        db.add(query)
+        db.commit()
+    return {"success": "Student(s) moved to archive"} 
+
+
+def unarchive_student(student_ids: List[StudentId], school_id, db: Session):
+    for student_id in student_ids:
+        query = db.exec(select(Student).where(Student.school_id == school_id, Student.id == student_id.id, Student.is_active == False)).first()
+        if not query:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="One of the selected students not  found.")
+        
+        
+        query.is_active = True
+        db.add(query)
+        db.commit()
+
+    return {"success": "Student(s) removed to archive"} 
 
 
 
@@ -90,17 +121,18 @@ def get_archived_students(school_id, db: Session):
     return db.exec(select(Student).where(Student.school_id == school_id, Student.is_active == False, Student.is_deleted == False)).all()
 
 
-def deactivate_student(student_id, school_id, db: Session):
-    query = db.exec(select(Student).where(Student.school_id == school_id, Student.id == student_id, Student.is_active == True)).first()
-    if not query:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found.")
-    
-    
-    query.is_active = False
-    query.is_deleted = True
-    query.date_deleted = datetime.now()
-    db.add(query)
-    db.commit()
+def deactivate_student(student_ids: List[StudentId], school_id, db: Session):
+    for student_id in student_ids:
+        query = db.exec(select(Student).where(Student.school_id == school_id, Student.id == student_id.id, Student.is_active == False)).first()
+        if not query:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found.")
+        
+        
+        # query.is_active = False
+        query.is_deleted = True
+        query.date_deleted = datetime.now()
+        db.add(query)
+        db.commit()
     return {"success": "Deleted Successfully"} 
 
 

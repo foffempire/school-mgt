@@ -32,7 +32,7 @@ class TeacherCreate(BaseModel):
     marital_status: str
     address: Optional[str]
     blood_group: Optional[str]
-    Religion: Optional[str]
+    religion: Optional[str]
     teacher_no: Optional[str] = None
     hire_date: date
     bio: Optional[str] = None
@@ -59,7 +59,7 @@ class TeacherUpdate(BaseModel):
     marital_status: str
     address: Optional[str]
     blood_group: Optional[str]
-    Religion: Optional[str]
+    religion: Optional[str]
     teacher_no: Optional[str] = None
     hire_date: date
     qualification: Optional[str] = None

@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
+from fastapi.staticfiles import StaticFiles
+
 from app.db.models import Schedule
 from .db.database import create_db_and_tables
 from fastapi.middleware.cors import CORSMiddleware
@@ -35,6 +37,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# make uploads folder readable from outside world
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 @app.on_event("startup")
 def on_startup():

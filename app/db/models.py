@@ -79,7 +79,7 @@ class UserCreate(SQLModel):
     marital_status: str = None
     address: Optional[str] = None
     blood_group: Optional[str] = None
-    Religion: Optional[str] = None
+    religion: Optional[str] = None
     bio: Optional[str] = None
     date_of_birth: Optional[date] = None
     image: Optional[str] = None

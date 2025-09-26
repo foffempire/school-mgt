@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel
 from datetime import date
 from enum import Enum
@@ -31,7 +31,7 @@ class StudentCreate(BaseModel):
     marital_status: str
     address: Optional[str]
     blood_group: Optional[str]
-    Religion: Optional[str]
+    religion: Optional[str]
     bio: Optional[str] = None
     image: Optional[str] = None
     date_of_birth: Optional[date] = None
@@ -53,7 +53,7 @@ class StudentUpdate(BaseModel):
     marital_status: str
     address: Optional[str]
     blood_group: Optional[str]
-    Religion: Optional[str]
+    religion: Optional[str]
     bio: Optional[str]
     date_of_birth: Optional[date]
     student_no: Optional[str] = None
@@ -64,3 +64,5 @@ class StudentUpdate(BaseModel):
 
 
 
+class StudentId(BaseModel):
+    id: str

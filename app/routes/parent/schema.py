@@ -21,7 +21,7 @@ class ParentCreate(BaseModel):
     marital_status: str
     address: Optional[str]
     blood_group: Optional[str]
-    Religion: Optional[str]
+    religion: Optional[str]
     bio: Optional[str] = None
     image: Optional[str] = None
     date_of_birth: Optional[date] = None
@@ -39,7 +39,7 @@ class ParentUpdate(BaseModel):
     marital_status: str
     address: Optional[str]
     blood_group: Optional[str]
-    Religion: Optional[str]
+    religion: Optional[str]
     bio: Optional[str]
     date_of_birth: Optional[date]
     occupation: Optional[str] = None

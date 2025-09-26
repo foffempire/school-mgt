@@ -29,7 +29,7 @@ class StaffCreate(BaseModel):
     marital_status: str
     address: Optional[str]
     blood_group: Optional[str]
-    Religion: Optional[str]
+    religion: Optional[str]
     bio: Optional[str] = None
     date_of_birth: Optional[date] = None
     image: Optional[str] = None
@@ -55,7 +55,7 @@ class StaffUpdate(BaseModel):
     marital_status: str
     address: Optional[str]
     blood_group: Optional[str]
-    Religion: Optional[str]
+    religion: Optional[str]
     bio: Optional[str] = None
     date_of_birth: Optional[date] = None
     staff_no: Optional[str] = None

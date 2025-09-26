@@ -3,7 +3,7 @@ from typing import List
 from app.db.database import SessionDep
 from app.security.oauth2 import AdminUserDep, CurrentUserDep
 from .schema import SchoolCreate, SchoolPublic, SchoolUpdate
-from .services import create_school, delete_school, get_school, update_school
+from .services import create_school, delete_school, get_school, school_info, update_school
 
 router = APIRouter(prefix="/v1/school", tags=["Schools"])
 
@@ -14,10 +14,10 @@ def add_school(school: SchoolCreate, session: SessionDep):
     return create_school(session, school)
 
 
-# @router.get("/", status_code=status.HTTP_200_OK, response_model=List[SchoolPublic])
-# def read_schools(session: SessionDep):
-#     """Get all schools"""
-#     return get_schools(session)
+@router.get("/complete", status_code=status.HTTP_200_OK)
+def my_school_info(session: SessionDep, current_admin: CurrentUserDep):
+    """Get complete school INFO"""
+    return school_info(current_admin.school_id, session)
 
 
 @router.get("/", status_code=status.HTTP_200_OK, response_model=SchoolPublic)
